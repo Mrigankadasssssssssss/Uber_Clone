@@ -375,3 +375,125 @@ Authorization: Bearer <token>
 
 * The endpoint **blacklists** the user's JWT token, preventing its further use.
 * The token is stored in the blacklist database and typically expires after a set duration (e.g., 24 hours).
+
+-----
+
+## /drivers/register Endpoint Documentation
+
+### Description(REGISTER/DRIVERS)
+
+The `/drivers/register` endpoint registers a **new driver**. It accepts driver details including personal information and vehicle details, hashes the password, and saves the driver to the database. Upon successful registration, it returns the created driver's information along with a **JSON Web Token (JWT)** for authentication.
+
+-----
+
+### HTTP Method(REGISTER/DRIVERS)
+
+`POST`
+
+-----
+
+### URL(REGISTER/DRIVERS)
+
+`/drivers/register`
+
+-----
+
+### Request Body(REGISTER/DRIVERS)
+
+The endpoint expects a **JSON object** with the following structure:
+
+```json
+{
+  "fullName": {
+    "firstName": "string (required, minimum 2 characters)",
+    "lastName": "string (required, minimum 2 characters)"
+  },
+  "email": "string (required, valid email)",
+  "password": "string (required, minimum 6 characters)",
+  "vehicle": {
+    "color": "string (required)",
+    "numberPlate": "string (required, minimum 5 characters)",
+    "capacity": "number (required, minimum 2)",
+    "vehicleType": "string (required, must be 'car', 'bike', or 'auto')"
+  }
+}
+```
+
+-----
+
+### Successful (REGISTER/DRIVERS)
+
+* **Status Code:** `201 Created`
+
+* **Response Body:**
+
+    ```json
+    {
+      "driver": {
+        "_id": "string",
+        "fullName": {
+          "firstName": "string",
+          "lastName": "string"
+        },
+        "email": "string",
+        "vehicle": {
+          "color": "string",
+          "numberPlate": "string",
+          "capacity": "number",
+          "vehicleType": "string"
+        },
+        "createdAt": "Date"
+        // other driver properties except password
+      },
+      "token": "string"
+    }
+    ```
+
+-----
+
+### Error (REGISTER/DRIVERS)
+
+#### Validation Error(REGISTER/DRIVERS)
+
+* **Status Code:** `400 Bad Request`
+
+* **Response Body:**
+
+    ```json
+    {
+      "errors": [
+        {
+          "msg": "Error message",
+          "param": "field_name",
+          "location": "body"
+        }
+      ]
+    }
+    ```
+
+#### Duplicate Email Error
+
+* **Status Code:** `400 Bad Request`
+
+* **Response Body:**
+
+    ```json
+    {
+      "error": "Driver with this email already exists"
+    }
+    ```
+
+#### Internal Server Error(REGISTER/DRIVERS)
+
+* **Status Code:** `500 Internal Server Error`
+
+* **Response Body:** (Typically an empty body or a generic error object indicating server failure.)
+
+-----
+
+### Notes(REGISTER/DRIVERS)
+
+* The endpoint uses **express-validator** to perform server-side validations.
+* Passwords are hashed using the same mechanism as user registration.
+* Vehicle type must be one of: 'car', 'bike', or 'auto'.
+* A **JWT** is generated for the new driver using the secret specified in the `.env` file.
