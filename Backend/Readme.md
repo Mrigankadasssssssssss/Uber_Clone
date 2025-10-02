@@ -497,3 +497,312 @@ The endpoint expects a **JSON object** with the following structure:
 * Passwords are hashed using the same mechanism as user registration.
 * Vehicle type must be one of: 'car', 'bike', or 'auto'.
 * A **JWT** is generated for the new driver using the secret specified in the `.env` file.
+
+-----
+
+## /drivers/login Endpoint Documentation
+
+### Description
+
+The `/drivers/login` endpoint authenticates an existing driver. It verifies the provided email, password, and vehicle details, and if valid, returns the driver's information along with a **JSON Web Token (JWT)** for authentication.
+
+-----
+
+### HTTP Method
+
+`POST`
+
+-----
+
+### URL
+
+`/drivers/login`
+
+-----
+
+### Request Body
+
+The endpoint expects a **JSON object** with the following structure:
+
+```json
+{
+  "email": "string (required, valid email)",
+  "password": "string (required)",
+  "vehicle": {
+    "numberPlate": "string (required, minimum 5 characters)",
+    "vehicleType": "string (required, must be 'car', 'bike', or 'auto')"
+  }
+}
+```
+
+-----
+
+### Successful Response
+
+* **Status Code:** `200 OK`
+
+* **Response Body:**
+
+    ```json
+    {
+      "driver": {
+        "_id": "string",
+        "fullName": {
+          "firstName": "string",
+          "lastName": "string"
+        },
+        "email": "string",
+        "vehicle": {
+          "color": "string",
+          "numberPlate": "string",
+          "capacity": "number",
+          "vehicleType": "string"
+        },
+        "status": "string",
+        "location": {
+          "lat": "number",
+          "lng": "number"
+        },
+        "createdAt": "Date"
+      },
+      "token": "string"
+    }
+    ```
+
+-----
+
+### Error Responses
+
+#### Validation Error
+
+* **Status Code:** `400 Bad Request`
+
+* **Response Body:**
+
+    ```json
+    {
+      "errors": [
+        {
+          "msg": "Error message",
+          "param": "field_name",
+          "location": "body"
+        }
+      ]
+    }
+    ```
+
+#### Authentication Error
+
+* **Status Code:** `400 Bad Request`
+
+* **Response Body:**
+
+    ```json
+    {
+      "error": "Invalid email or password"
+    }
+    ```
+
+#### Internal Server Error
+
+* **Status Code:** `500 Internal Server Error`
+
+* **Response Body:** (Typically an empty body or a generic error object indicating server failure.)
+
+-----
+
+### Notes
+
+* The endpoint uses **express-validator** to validate the request body.
+* Passwords are compared using **bcrypt**.
+* A **JWT** is generated for the authenticated driver and also set as a cookie.
+
+-----
+
+## /drivers/profile Endpoint Documentation
+
+### Description
+
+The `/drivers/profile` endpoint retrieves the profile of the currently **authenticated driver**. The driver must provide a valid JWT token to access this endpoint.
+
+-----
+
+### HTTP Method
+
+`GET`
+
+-----
+
+### URL
+
+`/drivers/profile`
+
+-----
+
+### Headers
+
+The request must include the following header for authentication:
+
+```text
+Authorization: Bearer <token>
+```
+
+-----
+
+### Successful Response
+
+* **Status Code:** `200 OK`
+
+* **Response Body:**
+
+    ```json
+    {
+      "driver": {
+        "_id": "string",
+        "fullName": {
+          "firstName": "string",
+          "lastName": "string"
+        },
+        "email": "string",
+        "vehicle": {
+          "color": "string",
+          "numberPlate": "string",
+          "capacity": "number",
+          "vehicleType": "string"
+        },
+        "status": "string",
+        "location": {
+          "lat": "number",
+          "lng": "number"
+        },
+        "createdAt": "Date"
+      }
+    }
+    ```
+
+-----
+
+### Error Responses
+
+#### Unauthorized Error
+
+* **Status Code:** `401 Unauthorized`
+
+* **Response Body:**
+
+    ```json
+    {
+      "errors": [
+        {
+          "msg": "Unauthorized Driver"
+        }
+      ]
+    }
+    ```
+
+#### Driver Not Found
+
+* **Status Code:** `401 Unauthorized`
+
+* **Response Body:**
+
+    ```json
+    {
+      "errors": [
+        {
+          "msg": "Driver not found"
+        }
+      ]
+    }
+    ```
+
+#### Internal Server Error
+
+* **Status Code:** `500 Internal Server Error`
+
+* **Response Body:** (Typically an empty body or a generic error object indicating server failure.)
+
+-----
+
+### Notes
+
+* The endpoint uses **JWT authentication** to verify the driver's identity.
+* The token must be valid and not blacklisted.
+
+-----
+
+## /drivers/logout Endpoint Documentation
+
+### Description
+
+The `/drivers/logout` endpoint logs out the currently authenticated driver by **blacklisting their JWT token**. The driver must provide a valid JWT token to access this endpoint.
+
+-----
+
+### HTTP Method
+
+`GET`
+
+-----
+
+### URL
+
+`/drivers/logout`
+
+-----
+
+### Headers
+
+The request must include the following header for authentication:
+
+```text
+Authorization: Bearer <token>
+```
+
+-----
+
+### Successful Response
+
+* **Status Code:** `200 OK`
+
+* **Response Body:**
+
+    ```json
+    {
+      "message": "Driver logged out successfully"
+    }
+    ```
+
+-----
+
+### Error Responses
+
+#### Unauthorized Error
+
+* **Status Code:** `401 Unauthorized`
+
+* **Response Body:**
+
+    ```json
+    {
+      "errors": [
+        {
+          "msg": "Unauthorized Driver"
+        }
+      ]
+    }
+    ```
+
+#### Internal Server Error
+
+* **Status Code:** `500 Internal Server Error`
+
+* **Response Body:** (Typically an empty body or a generic error object indicating server failure.)
+
+-----
+
+### Notes
+
+* The endpoint **blacklists** the driver's JWT token, preventing its further use.
+* The token is stored in the blacklist database and typically expires after 24 hours.
+* The endpoint also clears the authentication cookie if it exists.

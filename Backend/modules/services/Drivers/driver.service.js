@@ -13,3 +13,7 @@ module.exports.createDriver = async ({ firstName, lastName, email, password, col
     await newDriver.save();
     return newDriver;
   }
+
+module.exports.findDriverByEmail = async (email) => {
+    return await driverModel.findOne({ email }).select('+password');
+}
