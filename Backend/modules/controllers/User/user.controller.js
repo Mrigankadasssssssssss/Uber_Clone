@@ -1,6 +1,8 @@
 const userModel = require('../../models/Users/user.model');
 const { validationResult } = require('express-validator');
 const userService = require('../../services/User/user.service');
+const jwt = require('jsonwebtoken');
+
 
 module.exports.registerUser = async (req, res, next) => {
   const errors = validationResult(req);
@@ -18,7 +20,7 @@ module.exports.registerUser = async (req, res, next) => {
       password: hashedPassword,
     });
     const token = newUser.generateAuthToken();
-    res.header('Authorization', `Bearer ${token}`);
+    
     return res.status(201).json({ user: newUser, token: token });
   } catch (error) {
     next(error);
@@ -42,9 +44,28 @@ module.exports.loginUser = async (req, res, next) => {
       return res.status(401).json({ errors: [{ msg: 'Invalid email or password' }] });
     }
     const token = user.generateAuthToken();
-    res.header('Authorization', `Bearer ${token}`);
+    res.cookie('token', token)
     return res.status(200).json({ user, token });
   } catch (error) {
+    next(error);
+  }
+}
+
+module.exports.getUserProfile = async (req, res, next) => {
+  try{
+    res.status(200).json({ user: req.user });
+  }catch(error){
+    next(error);
+  }
+}
+
+module.exports.logoutUser = async (req, res, next) => {
+  try{
+    res.clearCookie('token');
+    const token = req.cookies.token || req.header('Authorization').replace('Bearer ', '');
+    await userService.blacklistToken(token);
+    return res.status(200).json({ message: 'Logged out successfully' });
+  }catch(error){
     next(error);
   }
 }

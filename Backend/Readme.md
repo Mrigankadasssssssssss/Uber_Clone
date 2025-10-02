@@ -4,13 +4,13 @@
 
 ### Description
 
-The `/users/register` endpoint registers a **new user**. It accepts user details, hashes the password, and saves the user to the database. Upon successful registration, it returns the created user's information along with a JSON Web Token (JWT) for authentication.
+The `/users/register` endpoint registers a **new user**. It accepts user details, hashes the password, and saves the user to the database. Upon successful registration, it returns the created user's information along with a **JSON Web Token (JWT)** for authentication.
 
 -----
 
 ### HTTP Method
 
-#### POST
+`POST`
 
 -----
 
@@ -67,7 +67,7 @@ The endpoint expects a **JSON object** with the following structure:
 
 -----
 
-### Error Responses (Registration)
+### Error Responses
 
 #### Validation Error
 
@@ -103,8 +103,6 @@ The endpoint expects a **JSON object** with the following structure:
 
 -----
 
------
-
 ## /users/login Endpoint Documentation
 
 ### Overview
@@ -113,7 +111,7 @@ The `/users/login` endpoint authenticates an existing user. It verifies the prov
 
 -----
 
-## Http Method
+### HTTP Method(LOGIN)
 
 `POST`
 
@@ -125,7 +123,7 @@ The `/users/login` endpoint authenticates an existing user. It verifies the prov
 
 -----
 
-### Request Body(Login)
+### Request Body(LOGIN)
 
 The endpoint expects a **JSON object** with the following structure:
 
@@ -138,7 +136,7 @@ The endpoint expects a **JSON object** with the following structure:
 
 -----
 
-### Successful Response (login)
+### Successful Response(LOGIN)
 
 * **Status Code:** `200 OK`
 
@@ -168,9 +166,9 @@ The endpoint expects a **JSON object** with the following structure:
 
 -----
 
-### Error Responses
+### Error Responses(LOGIN)
 
-#### Validation Error (Login)
+#### Validation Error(LOGIN)
 
 * **Status Code:** `400 Bad Request`
 
@@ -201,7 +199,7 @@ The endpoint expects a **JSON object** with the following structure:
     }
     ```
 
-#### Internal Server Error(Login)
+#### Internal Server Error(LOGIN)
 
 * **Status Code:** `500 Internal Server Error`
 
@@ -209,10 +207,171 @@ The endpoint expects a **JSON object** with the following structure:
 
 -----
 
-### Notes(login)
+### Notes(LOGIN)
 
 * The endpoint uses **express-validator** to validate the request body.
 * Passwords are compared using **bcrypt**. See `user.model.js` for password comparison implementation.
 * A **JWT** is generated for the authenticated user using the secret specified in the `.env` file and returned in the response header.
 
 -----
+
+## /users/profile Endpoint Documentation
+
+### Description(PROFILE)
+
+The `/users/profile` endpoint retrieves the profile of the currently **authenticated user**. The user must provide a valid JWT token to access this endpoint.
+
+-----
+
+### HTTP Method(PROFILE)
+
+`GET`
+
+-----
+
+### URL(PROFILE)
+
+`/users/profile`
+
+-----
+
+### Headers
+
+The request must include the following header for authentication:
+
+```text
+Authorization: Bearer <token>
+```
+
+-----
+
+### Successful Response(PROFILE)
+
+* **Status Code:** `200 OK`
+
+* **Response Body:**
+
+    ```json
+    {
+      "user": {
+        "_id": "string",
+        "fullName": {
+          "firstName": "string",
+          "lastName": "string"
+        },
+        "email": "string",
+        "createdAt": "Date"
+        // other user properties except password
+      }
+    }
+    ```
+
+-----
+
+### Error Responses(PROFILE)
+
+#### Unauthorized Error
+
+* **Status Code:** `401 Unauthorized`
+
+* **Response Body:**
+
+    ```json
+    {
+      "errors": [
+        {
+          "msg": "Unauthorized User"
+        }
+      ]
+    }
+    ```
+
+#### Internal Server Error(PROFILE)
+
+* **Status Code:** `500 Internal Server Error`
+
+* **Response Body:** (Typically an empty body or a generic error object indicating server failure.)
+
+-----
+
+### Notes(PROFILE)
+
+* The endpoint uses **JWT authentication** to verify the user's identity.
+* The token must be valid and not blacklisted.
+
+-----
+
+## /users/logout Endpoint Documentation
+
+### Description(LOGOUT)
+
+The `/users/logout` endpoint logs out the currently authenticated user by **blacklisting their JWT token**. The user must provide a valid JWT token to access this endpoint.
+
+-----
+
+### HTTP Method(LOGOUT)
+
+`GET`
+
+-----
+
+### URL(LOGOUT)
+
+`/users/logout`
+
+-----
+
+### Headers(LOGOUT)
+
+The request must include the following header for authentication:
+
+```text
+Authorization: Bearer <token>
+```
+
+-----
+
+### Successful Response(LOGOUT)
+
+* **Status Code:** `200 OK`
+
+* **Response Body:**
+
+    ```json
+    {
+      "message": "Logged out successfully"
+    }
+    ```
+
+-----
+
+### Error Responses(LOGOUT)
+
+#### Unauthorized Error(LOGOUT)
+
+* **Status Code:** `401 Unauthorized`
+
+* **Response Body:**
+
+    ```json
+    {
+      "errors": [
+        {
+          "msg": "Unauthorized User"
+        }
+      ]
+    }
+    ```
+
+#### Internal Server Error(LOGOUT)
+
+* **Status Code:** `500 Internal Server Error`
+
+* **Response Body:** (Typically an empty body or a generic error object indicating server failure.)
+
+-----
+
+### Notes(LOGOUT)
+
+* The endpoint **blacklists** the user's JWT token, preventing its further use.
+* The token is stored in the blacklist database and typically expires after a set duration (e.g., 24 hours).
