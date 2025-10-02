@@ -18,7 +18,16 @@ async function createUser({ firstName, lastName, email, password }) {
     throw new Error("Internal server error");
   }
 }
-
+async function findUser(email){
+  try{
+    const user = await userModel.findOne({ email }).select('+password');
+    return user;
+  } catch (error) {
+    console.error("Error finding user:", error);
+    throw new Error("Internal server error");
+  }
+}
 module.exports = {
   createUser,
+  findUser,
 };
