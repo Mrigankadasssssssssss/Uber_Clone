@@ -40,7 +40,7 @@ module.exports.loginDriver = async (req, res, next) => {
       return res.status(400).json({ errors: errors.array() });
     }
     try{
-        const { email, password, vehicle } = req.body;
+        const { email, password} = req.body;
         const driver = await driverService.findDriverByEmail(email);
         if(!driver){
             return res.status(400).json({ error: 'Invalid email or password' });

@@ -39,13 +39,7 @@ routes.post(
   [
     body("email").isEmail().withMessage("Invalid email address"),
     body("password").exists().withMessage("Password is required"),
-    body("vehicle.numberPlate")
-      .isLength({ min: 5 })
-      .withMessage("Number plate must be at least 5 characters long"),
-
-    body("vehicle.vehicleType")
-      .isIn(["car", "bike", "auto"])
-      .withMessage("Vehicle type must be car, bike, or auto"),
+    
   ],
   driverController.loginDriver
 );

@@ -1,0 +1,104 @@
+/* eslint-disable no-unused-vars */
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+
+const DriverRegister = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [userData, setUserData] = useState({
+    userName: "",
+    email: "",
+    password: "",
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setUserData({
+      userName: { firstName: firstName, lastName: lastName },
+      email: email,
+      password: password,
+    });
+    // Reset form fields
+    setFirstName("");
+    setLastName("");
+    setEmail("");
+    setPassword("");
+  };
+  return (
+    <div className="h-screen p-7 flex flex-col justify-between">
+      <div>
+        <img
+          className="w-16  mb-10"
+          src="../../public/driverlogo.png"
+          alt="Uber Logo"
+        />
+        <form
+          onSubmit={(e) => {
+            handleSubmit(e);
+          }}
+        >
+          <h3 className="text-xl font-semibold mb-2">What's Your Name?</h3>
+          <div className="flex gap-4 mb-4">
+            <input
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="bg-[#eeeeee]  border border-gray-300 p-2 rounded-md  w-1/2 text-lg placeholder:text-base"
+              required
+              type="text"
+              placeholder="John"
+            />
+            <input
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="bg-[#eeeeee]  border border-gray-300 p-2 rounded-md w-1/2 text-lg placeholder:text-base"
+              type="text"
+              placeholder="Doe"
+            />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">What's Your Email?</h3>
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="bg-[#eeeeee]  border border-gray-300 p-2 rounded-md mb-4 w-full text-lg placeholder:text-base"
+            required
+            type="email"
+            placeholder="example@gmail.com"
+          />
+          <h3 className="text-xl font-semibold mb-2">Create Your Password</h3>
+          <input
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="bg-[#eeeeee]  border border-gray-300 p-2 rounded-md mb-4 w-full text-lg placeholder:text-base"
+            required
+            type="password"
+            placeholder="********"
+          />
+          <button
+            className="bg-black text-white py-2 px-4 rounded-md w-full font-semibold text-xl"
+            type="submit"
+          >
+            Sign Up
+          </button>
+          <p className="mt-4 text-gray-500 text-center">
+            Already have an account?{" "}
+            <Link
+              to="/drivers/login"
+              className="text-blue-500 text-lg text-semibold underline"
+            >
+              Go to Login
+            </Link>
+          </p>
+        </form>
+      </div>
+      <div>
+        <p className="text-gray-500 text-[10px] leading-tight">
+          Uber drivers need a valid driver's license, proof of residency, an eligible four-door vehicle, and must pass a background check to register.{" "}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+export default DriverRegister
