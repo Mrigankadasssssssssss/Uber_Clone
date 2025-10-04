@@ -1,7 +1,9 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
+import { DriverDataContext } from "../context/DriverContext";
+import axios from "axios";
 const DriverLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -9,10 +11,33 @@ const DriverLogin = () => {
     email: "",
     password: "",
   });
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  const { driver, setDriver } = React.useContext(DriverDataContext);
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setDriverData({ email: email, password: password });
-    
+    const driverData = { email: email, password: password };
+    const response = await axios.post(
+      import.meta.env.VITE_BASE_URL + "/drivers/login",
+      driverData
+    );
+    if (response.status === 200) {
+      const resData = response.data;
+      // Store token and driver info
+      const token =
+        resData.token ||
+        resData.driver?.token ||
+        response?.headers?.authorization ||
+        response?.headers?.["x-auth-token"];
+
+      if (!token) {
+        console.warn("No token found in response — check API response shape.");
+      } else {
+        localStorage.setItem("Drivertoken", token);
+      }
+
+      setDriver(resData.driver);
+      navigate("/drivers-home");
+    }
     // Reset form fields
     setEmail("");
     setPassword("");

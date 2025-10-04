@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+//* eslint-disable no-unused-vars *//
 /* eslint-disable react-refresh/only-export-components */
 import React, { useState } from 'react'
 import { createContext } from 'react'
@@ -7,7 +7,7 @@ export const UserDataContext = createContext();
 const UserContext = ({children}) => {
 
     const [user, setUser] = useState({
-        userName: {
+        fullName: {
             firstName: "",
             lastName: ""
         },
@@ -15,7 +15,7 @@ const UserContext = ({children}) => {
     })
   return (
     <div>
-      <UserDataContext.Provider value={[user, setUser]}>{children}</UserDataContext.Provider>
+      <UserDataContext.Provider value={{user, setUser}}>{children}</UserDataContext.Provider>
     </div>
   )
 }
