@@ -1,49 +1,47 @@
-/* eslint-disable no-unused-vars */
 import axios from "axios";
-import React, { useEffect } from "react";
-import { useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserDataContext } from "../context/UserContext";
-import { useState } from "react";
 
 const UserProtectedwrapper = ({ children }) => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const { user, setUser } = useContext(UserDataContext);
-  const [isLoading, setisLoading] = useState(true);
+  const { setUser } = useContext(UserDataContext);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!token) {
       navigate("/users/login");
+      return;
     }
-  }, [token, navigate]);
-  axios
-    .get(import.meta.env.VITE_BASE_URL + "/users/profile", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then((response) => {
-      if (response.status === 200) {
-        setUser(response.data.user);
-        setisLoading(false);
+
+    const fetchUserProfile = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}/users/profile`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (response.status === 200) {
+          setUser(response.data.user);
+        }
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+        navigate("/users/login");
+      } finally {
+        setIsLoading(false);
       }
-    })
-    .catch((err) => {
-      console.error("Error fetching driver data:", err);
-      navigate("/users/login");
-    });
+    };
+
+    fetchUserProfile();
+  }, [token, navigate, setUser]);
 
   if (isLoading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "80vh",
-        }}
-      >
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
         <div
           style={{
             border: "8px solid #f3f3f3",
@@ -56,11 +54,11 @@ const UserProtectedwrapper = ({ children }) => {
         />
         <style>
           {`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-              `}
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          `}
         </style>
       </div>
     );
