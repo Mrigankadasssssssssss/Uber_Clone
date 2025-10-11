@@ -12,6 +12,7 @@ import DriverProtectedwrapper from "./pages/DriverProtectedwrapper";
 import DriverStart from "./pages/DriverStart";
 import DriverLogout from "./pages/DriverLogout";
 import Riding from "./pages/Riding";
+import DriverRiding from "./pages/DriverRiding";
 const App = () => {
   return (
     <Router>
@@ -22,6 +23,7 @@ const App = () => {
         <Route path="/drivers/login" element={<DriverLogin />} />
         <Route path="/drivers/register" element={<DriverRegister />} />
         <Route path="/riding" element={<Riding />} />
+        <Route path="/drivers-riding" element={<DriverRiding />} />
         <Route
           path="/home"
           element={
